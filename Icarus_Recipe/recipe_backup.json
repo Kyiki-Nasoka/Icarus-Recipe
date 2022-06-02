@@ -1,0 +1,42 @@
+{
+    "gunpowder":{
+       "sulfur":1,
+       "charcoal":1
+    },
+    "rifle round":{
+       "iron ingot":1,
+       "gunpowder":1
+    },
+    "electronics":{
+       "refined gold":1,
+       "copper ingot":3,
+       "organic resin":2,
+       "epoxy":2
+    },
+    "organic resin":{
+       "wood":1,
+       "oxite":1
+    },
+    "epoxy":{
+       "crushed bone":4
+    },
+    "crushed bone":{
+       "bone":2
+    },
+    "material processor":{
+       "aluminium ingot":30,
+       "electronics":60,
+       "carbon fiber":8,
+       "steel screws":12,
+       "titanium ingot":8
+    },
+    "carbon fiber":{
+       "carbon paste":1
+    },
+    "carbon paste":{
+       "silica":1,
+       "aluminium ingot":1,
+       "organic resin":4,
+       "epoxy":2
+    }
+ }
