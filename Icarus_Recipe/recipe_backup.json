@@ -1,42 +1,111 @@
 {
-    "gunpowder":{
-       "sulfur":1,
-       "charcoal":1
-    },
-    "rifle round":{
-       "iron ingot":1,
-       "gunpowder":1
-    },
-    "electronics":{
-       "refined gold":1,
-       "copper ingot":3,
-       "organic resin":2,
-       "epoxy":2
-    },
-    "organic resin":{
-       "wood":1,
-       "oxite":1
-    },
-    "epoxy":{
-       "crushed bone":4
-    },
-    "crushed bone":{
-       "bone":2
-    },
-    "material processor":{
-       "aluminium ingot":30,
-       "electronics":60,
-       "carbon fiber":8,
-       "steel screws":12,
-       "titanium ingot":8
-    },
-    "carbon fiber":{
-       "carbon paste":1
-    },
-    "carbon paste":{
-       "silica":1,
-       "aluminium ingot":1,
-       "organic resin":4,
-       "epoxy":2
-    }
- }
+   "gunpowder":{
+      "sulfur":1,
+      "charcoal":1
+   },
+   "rifle round":{
+      "iron ingot":1,
+      "gunpowder":1
+   },
+   "electronics":{
+      "refined gold":1,
+      "copper ingot":3,
+      "organic resin":2,
+      "epoxy":2
+   },
+   "organic resin":{
+      "wood":1,
+      "oxite":1
+   },
+   "epoxy":{
+      "crushed bone":4
+   },
+   "crushed bone":{
+      "bone":2
+   },
+   "material processor":{
+      "aluminium ingot":30,
+      "electronics":60,
+      "carbon fiber":8,
+      "steel screws":12,
+      "titanium ingot":8
+   },
+   "carbon fiber":{
+      "carbon paste":1
+   },
+   "carbon paste":{
+      "silica":1,
+      "aluminium ingot":1,
+      "organic resin":4,
+      "epoxy":2
+   },
+   "machining bench":{
+      "wood": 20,
+      "stone": 12,
+      "iron nails": 120,
+      "iron ingot": 40,
+      "epoxy": 10,
+      "rope": 24
+   },
+   "iron nails": {
+      "iron ingot": 0.1
+   },
+   "rope": {
+      "twine": 12
+   },
+   "concrete furnace": {
+      "iron ingot": 12,
+      "rope": 8,
+      "epoxy": 12,
+      "concrete mix": 20
+   },
+   "cement mixer": {
+      "wood": 50,
+      "stone": 40,
+      "iron ingot": 20,
+      "rope": 8,
+      "iron nail": 8
+   },
+   "concrete mix": {
+      "tree sap": 1,
+      "stone": 8,
+      "silica ore": 4
+   },
+   "tree sap": {
+      "stick": 4
+   },
+   "steel ingot": {
+      "iron ore": 6,
+      "coal ore": 1
+   },
+   "recurve bow": {
+      "steel ingot": 6,
+      "rope": 6,
+      "aluminium ingot": 14,
+      "epoxy": 6,
+      "steel screw": 3
+   },
+   "steel screw": {
+      "steel ingot": 0.01
+   },
+   "steel pickaxe": {
+      "wood": 5,
+      "epoxy": 4,
+      "steel ingot": 6
+   },
+   "aluminium arrow": {
+      "copper ingot": 1,
+      "aluminium ingot": 4,
+      "epoxy": 1
+   },
+   "carbon arrow": {
+      "copper ingot": 1,
+      "carbon fiber": 4,
+      "epoxy": 1
+   },
+   "steel arrow": {
+      "epoxy": 1,
+      "stick": 1,
+      "steel ingot": 1
+   }
+}
