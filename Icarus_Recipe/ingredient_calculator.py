@@ -4,27 +4,37 @@ import json
 with open("Icarus_Recipe/recipes.json", "r") as infile:
     recipes = json.load(infile)
 
-def default_layout() -> None:
-    return [
+def default_layout() -> None: 
+        return [
         [sg.Text("Target Item"), sg.Input(key="ITEM_TARGET")],
         [sg.Text("Count to make"), sg.Input(key="ITEM_COUNT")],
-        [sg.Button("Calculate", key="CALCULATE")],
-        [sg.Text("Output", key="OUTPUT")],
-        [sg.Button("Add Recipe", key="ADDRECIPE"), sg.Button("Save Recipe and close", key="SAVE")]
+        [sg.Button("Calculate", key="CALCULATE"), sg.Button("Add Recipe", key="-ADD RECIPE-"), sg.Button("Exit")],
+        [sg.Column([[sg.Text("Line 1", key="OUTPUT")]])],
     ]
 
-layout = default_layout()
+def recipe_layout() -> None:
+        return [
+        [sg.Text("Adding New Recipe")],
+        [sg.Button("Save"), sg.Button("Cancel")],
+        [sg.Input("Item Name")],
+        [sg.Input("Ingredient 1"), sg.Input("Count")],
+        [sg.Input("Ingredient 2"), sg.Input("Count")],
+        [sg.Input("Ingredient 3"), sg.Input("Count")],
+        [sg.Input("Ingredient 4"), sg.Input("Count")],
+        [sg.Input("Ingredient 5"), sg.Input("Count")]
+        
+]
 
-window = sg.Window("Resource Calculator", layout)
+window = sg.Window("Resource Calculator", default_layout())
 
 def main() -> None:
     i = 0
     while True:
         event, values = window.read()
-        print(event, values)
+        print("main window output: ",event, values)
+        if event == sg.WIN_CLOSED or event == "Exit":
+            break
         match event:
-            case sg.WIN_CLOSED:
-                break
             case "CALCULATE":
                 target = values["ITEM_TARGET"].lower()
                 count = values["ITEM_COUNT"]
@@ -37,20 +47,21 @@ def main() -> None:
                 output = get_base_ingredients(get_craft_tree(target, int(count)))
                 print(get_craft_tree(target, int(count)))
                 print_result(output)
-            case "ADDRECIPE":
-                window.extend_layout(window, [[sg.Text("Ingredient:"), sg.I(key = f'-IN-{i}'), sg.Text("Count:"), sg.I(key = f"-REQUIRED-{i}")]])
-                i += 1
-            case "SAVE":
-                target = values["ITEM_TARGET"].lower()
+            case "-ADD RECIPE-":
+                e, v = sg.Window("Input Window", recipe_layout()).read(close=True)
+                if e == "Cancel" or e == sg.WIN_CLOSED:
+                    continue
+                print("recipe window output: ", e, v)
+                target = v[0].lower()
+                del v[0]
+                if target in recipes:
+                    continue
                 recipes[target] = {}
-                for x in range(i):
-                    recipes[target][values[f"-IN-{x}"]] = float(values[f"-REQUIRED-{x}"])
+                reduced_values = {k:v for k,v in v.items() if ("Ingredient" not in v) if ("Count" not in v)} #remove default values
+                for x in range(int(len(reduced_values)/2)):
+                   recipes[target][v[x+1].lower()] = v[x+2]
                 with open("Icarus_Recipe/recipes.json", "w", encoding = "utf-8") as outfile:
-                    json.dump(recipes, outfile, ensure_ascii=False, indent=4)
-                #layout = default_layout()
-                break
-                
-
+                    json.dump(recipes, outfile, ensure_ascii=False, indent=4)          
     
     window.close()
 

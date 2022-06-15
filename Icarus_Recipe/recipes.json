@@ -171,5 +171,8 @@
         "wood": 2.0,
         "leather": 4.0,
         "platinum ingot": 12.0
+    },
+    "wood pile": {
+        "wood": "100"
     }
 }
