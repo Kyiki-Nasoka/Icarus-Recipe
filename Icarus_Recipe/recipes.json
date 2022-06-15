@@ -34,7 +34,7 @@
         "carbon paste": 1
     },
     "carbon paste": {
-        "silica": 1,
+        "silica ore": 1,
         "aluminium ingot": 1,
         "organic resin": 4,
         "epoxy": 2
@@ -110,5 +110,66 @@
     },
     "steel rebar": {
         "steel ingot": 0.1
+    },
+    "electric furnace": {
+        "steel ingot": 30.0,
+        "glass": 4.0,
+        "electronics": 60.0,
+        "concrete mix": 80.0,
+        "steel screw": 8.0
+    },
+    "stone roof": {
+        "wood": 6.0,
+        "stone": 18.0,
+        "leather": 4.0,
+        "iron nail": 6.0
+    },
+    "biofuel extractor": {
+        "iron ingot": 15.0,
+        "refined gold": 5.0,
+        "copper nail": 10.0
+    },
+    "biofuel radar": {
+        "iron ingot": 12.0,
+        "refined gold": 10.0,
+        "iron nail": 8.0,
+        "glass": 2.0,
+        "copper ingot": 12.0
+    },
+    "bolt action rifle": {
+        "wood": 12.0,
+        "leather": 8.0,
+        "steel ingot": 40.0,
+        "epoxy": 4.0,
+        "steel screw": 10.0
+    },
+    "fabricator": {
+        "aluminium ingot": 40.0,
+        "electronics": 30.0,
+        "concrete mix": 30.0,
+        "carbon fiber": 8.0,
+        "steel screw": 30.0
+    },
+    "caveworm bow": {
+        "wood": 10.0,
+        "leather": 25.0,
+        "worm scale": 15.0,
+        "poison sack": 10.0
+    },
+    "filled biofuel can": {
+        "biofuel can": 1.0,
+        "stick": 500.0,
+        "tree sap": 100.0
+    },
+    "biofuel can": {
+        "iron ingot": 25.0
+    },
+    "stick": {
+        "wood": 0.1
+    },
+    "platinum pickaxe": {
+        "wood": 2.0,
+        "leather": 4.0,
+        "platinum ingot": 12.0
     }
 }
