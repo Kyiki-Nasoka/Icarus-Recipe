@@ -1,3 +1,5 @@
+#version v0.1
+
 import PySimpleGUI as sg
 import json
 
@@ -8,8 +10,8 @@ def default_layout() -> None:
         return [
         [sg.Text("Target Item"), sg.Input(key="ITEM_TARGET")],
         [sg.Text("Count to make"), sg.Input(key="ITEM_COUNT")],
-        [sg.Button("Calculate", key="CALCULATE"), sg.Button("Add Recipe", key="-ADD RECIPE-"), sg.Button("Exit")],
-        [sg.Column([[sg.Text("Line 1", key="OUTPUT")]])],
+        [sg.Button("Calculate", key="CALCULATE", bind_return_key=True), sg.Button("Add Recipe", key="-ADD RECIPE-"), sg.Button("Exit")],
+        [sg.Text("", key="OUTPUT")]
     ]
 
 def recipe_layout() -> None:
@@ -25,10 +27,83 @@ def recipe_layout() -> None:
         
 ]
 
-window = sg.Window("Resource Calculator", default_layout())
+def output_layout(target: str, count: int) -> None:
+    output = get_craft_tree(target, count)
+    print("output_layout: ", output)
+    totals = get_base_ingredients(output[target])
+    treedata = create_output_tree(output)
+    return [
+        [sg.Button("Close", key="-CLOSE-")],
+        [sg.Tree(data=treedata,
+            headings=['Total', ],
+            auto_size_columns=True,
+            select_mode=sg.TABLE_SELECT_MODE_EXTENDED,
+            col0_width=40,
+            key='-TREE-',
+            show_expanded=True,
+            enable_events=True,
+            expand_x=True,
+            expand_y=True,
+        )],
+        [sg.Text(totals)]
+    ]
+
+def get_craft_tree(tgt: dict, total: int, first_pass: bool = True) -> dict:
+    recipe_tree = dict()
+    recipe_tree["count"] = total
+    for k, v in recipes[tgt].items():
+        if k in recipes:
+            recipe_tree[k] = get_craft_tree(k, total*v, False)
+        else:
+            recipe_tree[k] = {"count": v*int(total)}
+    return {tgt: recipe_tree} if first_pass else recipe_tree
+
+def get_base_ingredients(tgt: dict) -> dict:
+    output = dict()
+    for k, v in tgt.items():
+        if isinstance(v, dict):
+            if v["count"] and len(v) == 1:
+                if k in output:
+                    output[k] += v["count"]
+                else:
+                    output[k] = 0
+                    output[k] += v["count"]
+            else:
+                temp_dict = get_base_ingredients(v)
+                for i, j in temp_dict.items():
+                    if i in output:
+                        output[i] += j
+                    else:
+                        output[i] = j
+
+    return output
+
+def create_output_tree(inc: dict, parent: str = "", treedata: sg.TreeData = None) -> sg.TreeData:
+    if treedata is None:
+        treedata = sg.TreeData()
+    for k, v in inc.items():
+        if isinstance(v, dict):            
+            treedata.Insert(parent, k, k, values=[v["count"]])
+            create_output_tree(v, k, treedata)
+    return treedata
+
+def calculate_result(target: str, count: int) -> None:
+    output_window =  sg.Window("Result", output_layout(target, count), resizable=True)
+    while True:
+        output_event, output_values = output_window.read()
+        if output_event == sg.WIN_CLOSED or output_event == "-CLOSE-":
+            break
+    output_window.close()
+
+def add_recipe(target: str, inc_recipe: dict):
+    recipes[target] = {}
+    reduced_values = {k:v for k,v in inc_recipe.items() if ("Ingredient" not in v) if ("Count" not in v)} #remove default values
+    for x in range(1, int(len(reduced_values)), 2):
+        recipes[target][reduced_values[x].lower()] = int(reduced_values[x+1])
+    with open("Icarus_Recipe/recipes.json", "w", encoding = "utf-8") as outfile:
+        json.dump(recipes, outfile, ensure_ascii=False, indent=4)
 
 def main() -> None:
-    i = 0
     while True:
         event, values = window.read()
         print("main window output: ",event, values)
@@ -37,71 +112,30 @@ def main() -> None:
         match event:
             case "CALCULATE":
                 target = values["ITEM_TARGET"].lower()
-                count = values["ITEM_COUNT"]
+                count = int(values["ITEM_COUNT"])
                 if target == "" or count == "":
                     window["OUTPUT"].update("Please enter values in both target and count")
                     continue
                 elif target not in recipes:
                     window["OUTPUT"].update(f"{target} not found in recipe list")
                     continue
-                output = get_base_ingredients(get_craft_tree(target, int(count)))
-                print(get_craft_tree(target, int(count)))
-                print_result(output)
+                calculate_result(target, count)    
+                
             case "-ADD RECIPE-":
                 e, v = sg.Window("Input Window", recipe_layout()).read(close=True)
                 if e == "Cancel" or e == sg.WIN_CLOSED:
                     continue
-                print("recipe window output: ", e, v)
                 target = v[0].lower()
                 del v[0]
                 if target in recipes:
                     continue
-                recipes[target] = {}
-                reduced_values = {k:v for k,v in v.items() if ("Ingredient" not in v) if ("Count" not in v)} #remove default values
-                for x in range(int(len(reduced_values)/2)):
-                   recipes[target][v[x+1].lower()] = v[x+2]
-                with open("Icarus_Recipe/recipes.json", "w", encoding = "utf-8") as outfile:
-                    json.dump(recipes, outfile, ensure_ascii=False, indent=4)          
+                add_recipe(target, v)
     
     window.close()
 
-#for each key in recipe list, check if it's value is in the recipes. If so, then make the entry for that item. Otherwise, default format
-def get_craft_tree(tgt: dict, total: int = 1) -> dict():
-    recipe_tree = dict()
-    recipe_tree[tgt] = dict()
-    for k, v in recipes[tgt].items():
-        if k in recipes:
-            recipe_tree[tgt][k] = get_craft_tree(k, total*v)
-        else:
-            recipe_tree[tgt][k] = v*int(total)
-    return recipe_tree
-
-def get_base_ingredients(tgt: dict) -> dict:
-    output = dict()
-    for k, v in tgt.items():
-        if isinstance(v, dict):
-            temp_dict = get_base_ingredients(v)
-            for i, j in temp_dict.items():
-                if i in output:
-                    output[i] += j
-                else:
-                    output[i] = j
-        else:
-            if k in output:
-                output[k] += v
-            else:
-                output[k] = v
-    return output
 
 
-def add_result_layer(first: str, second: str) -> list:
-    return [sg.Text(f"{first}: {second}")]
-
-def print_result(input: dict) -> None:
-    s = ""
-    for k, v in input.items():
-        s = s + f"{k}: {v}\n"
-    window["OUTPUT"].update(s)
+window = sg.Window("Resource Calculator", default_layout())
 
 if __name__ == "__main__":
         main()

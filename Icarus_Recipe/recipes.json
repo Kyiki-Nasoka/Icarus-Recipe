@@ -174,5 +174,28 @@
     },
     "wood pile": {
         "wood": "100"
+    },
+    "stone pile": {
+        "stone": 100
+    },
+    "electric extractor": {
+        "iron ingot": 20,
+        "electronics": 4
+    },
+    "solar panel": {
+        "electronics": 30,
+        "steel screws": 10,
+        "glass": 60,
+        "composites": 18,
+        "carbon fiber": 8
+    },
+    "composites": {
+        "composite paste": 1
+    },
+    "composite paste": {
+        "iron ore": 2,
+        "silica ore": 1,
+        "organic resin": 1,
+        "gold ore": 1
     }
 }
