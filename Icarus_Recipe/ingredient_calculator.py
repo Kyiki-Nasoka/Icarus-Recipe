@@ -1,10 +1,22 @@
-#version v0.1
+#version v0.1.1
 
+import os
 import PySimpleGUI as sg
 import json
+import pathlib
 
-with open("Icarus_Recipe/recipes.json", "r") as infile:
-    recipes = json.load(infile)
+
+
+current_directory = pathlib.Path(__file__).parent.resolve()
+input_file = os.path.join(current_directory, "recipes.json")
+if os.path.exists(input_file):
+    with open(input_file, "r") as infile:
+        recipes = json.load(infile)
+else: 
+    with open(input_file, "w") as infile:
+        #create empty recipe file
+        pass
+
 
 def default_layout() -> None: 
         return [
