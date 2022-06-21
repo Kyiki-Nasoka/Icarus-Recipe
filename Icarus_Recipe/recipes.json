@@ -172,12 +172,6 @@
         "leather": 4.0,
         "platinum ingot": 12.0
     },
-    "wood pile": {
-        "wood": "100"
-    },
-    "stone pile": {
-        "stone": 100
-    },
     "electric extractor": {
         "iron ingot": 20,
         "electronics": 4

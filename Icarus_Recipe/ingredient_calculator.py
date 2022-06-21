@@ -1,36 +1,37 @@
-#version v0.1.1
+#version v0.1.4
 
-import os
+import os, sys
 import PySimpleGUI as sg
 import json
-import pathlib
 
 
+if getattr(sys, 'frozen', False):
+    current_directory = os.path.dirname(sys.executable)
+elif __file__:
+    current_directory = os.path.dirname(__file__)
+recipe_file = os.path.join(current_directory, "recipes.json")
 
-current_directory = pathlib.Path(__file__).parent.resolve()
-input_file = os.path.join(current_directory, "recipes.json")
-if os.path.exists(input_file):
-    with open(input_file, "r") as infile:
+if os.path.exists(recipe_file):
+    print(f"opening {recipe_file} to get saved recipes")
+    with open(recipe_file, "r") as infile:
         recipes = json.load(infile)
 else: 
-    with open(input_file, "w") as infile:
-        #create empty recipe file
-        pass
-
+    recipes = dict()
 
 def default_layout() -> None: 
         return [
-        [sg.Text("Target Item"), sg.Input(key="ITEM_TARGET")],
+        [sg.Text("Target Item"), sg.Input(key="ITEM_TARGET", focus=True)],
         [sg.Text("Count to make"), sg.Input(key="ITEM_COUNT")],
-        [sg.Button("Calculate", key="CALCULATE", bind_return_key=True), sg.Button("Add Recipe", key="-ADD RECIPE-"), sg.Button("Exit")],
+        [sg.Button("Calculate", key="CALCULATE", bind_return_key=True), sg.Button("Add Recipe", key="-ADD RECIPE-"),
+            sg.Button("Delete Recipe", key="-DELETE-"), sg.Button("Keep On Top", key="-KEEPTOP-"), sg.Button("Exit")],
         [sg.Text("", key="OUTPUT")]
     ]
 
-def recipe_layout() -> None:
+def recipe_layout(cur_item: str) -> None:
         return [
         [sg.Text("Adding New Recipe")],
-        [sg.Button("Save"), sg.Button("Cancel")],
-        [sg.Input("Item Name")],
+        [sg.Button("Save", bind_return_key=True), sg.Button("Cancel")],
+        [sg.Input(cur_item, focus=True)],
         [sg.Input("Ingredient 1"), sg.Input("Count")],
         [sg.Input("Ingredient 2"), sg.Input("Count")],
         [sg.Input("Ingredient 3"), sg.Input("Count")],
@@ -38,6 +39,13 @@ def recipe_layout() -> None:
         [sg.Input("Ingredient 5"), sg.Input("Count")]
         
 ]
+
+def delete_layout() -> None:
+    return [
+        [sg.Text("Enter recipe to delete.")],
+        [sg.Button("Delete"), sg.Button("Cancel")],
+        [sg.Input(focus=True)]
+    ]
 
 def output_layout(target: str, count: int) -> None:
     output = get_craft_tree(target, count)
@@ -59,6 +67,9 @@ def output_layout(target: str, count: int) -> None:
         )],
         [sg.Text(totals)]
     ]
+
+def output_message(target: str, message: str) -> None:
+    window[target].update(message)
 
 def get_craft_tree(tgt: dict, total: int, first_pass: bool = True) -> dict:
     recipe_tree = dict()
@@ -99,23 +110,27 @@ def create_output_tree(inc: dict, parent: str = "", treedata: sg.TreeData = None
             create_output_tree(v, k, treedata)
     return treedata
 
-def calculate_result(target: str, count: int) -> None:
-    output_window =  sg.Window("Result", output_layout(target, count), resizable=True)
+def calculate_result(target: str, count: int, tops: bool) -> None:
+    output_window =  sg.Window("Result", output_layout(target, count), resizable=True, keep_on_top=tops)
     while True:
         output_event, output_values = output_window.read()
         if output_event == sg.WIN_CLOSED or output_event == "-CLOSE-":
             break
     output_window.close()
 
+def save_recipe_file(rec_dict: dict) -> None:
+    with open(recipe_file, "w", encoding = "utf-8") as outfile:
+        json.dump(rec_dict, outfile, ensure_ascii=False, indent=4)
+
 def add_recipe(target: str, inc_recipe: dict):
     recipes[target] = {}
     reduced_values = {k:v for k,v in inc_recipe.items() if ("Ingredient" not in v) if ("Count" not in v)} #remove default values
     for x in range(1, int(len(reduced_values)), 2):
         recipes[target][reduced_values[x].lower()] = int(reduced_values[x+1])
-    with open("Icarus_Recipe/recipes.json", "w", encoding = "utf-8") as outfile:
-        json.dump(recipes, outfile, ensure_ascii=False, indent=4)
+    save_recipe_file(recipes)
 
 def main() -> None:
+    keep_output_on_top = False
     while True:
         event, values = window.read()
         print("main window output: ",event, values)
@@ -124,24 +139,38 @@ def main() -> None:
         match event:
             case "CALCULATE":
                 target = values["ITEM_TARGET"].lower()
-                count = int(values["ITEM_COUNT"])
-                if target == "" or count == "":
-                    window["OUTPUT"].update("Please enter values in both target and count")
+                if target == "" or values["ITEM_COUNT"] == "":
+                    output_message("OUTPUT", "Please enter values in both target and count")
                     continue
                 elif target not in recipes:
-                    window["OUTPUT"].update(f"{target} not found in recipe list")
+                    output_message("OUTPUT", f"{target} not found in recipe list")
                     continue
-                calculate_result(target, count)    
-                
+                count = int(values["ITEM_COUNT"])
+                calculate_result(target, count, keep_output_on_top)
             case "-ADD RECIPE-":
-                e, v = sg.Window("Input Window", recipe_layout()).read(close=True)
+                e, v = sg.Window("Input Window", recipe_layout(values["ITEM_TARGET"].lower())).read(close=True)
+                if e == "Cancel" or e == sg.WIN_CLOSED:
+                    output_message("OUTPUT", "Recipe addition canceled")
+                target = v[0].lower()
+                del v[0]
+                add_recipe(target, v)
+                output_message("OUTPUT", f"{target} added to recipes")
+            case "-DELETE-":
+                e, v = sg.Window("Delete Window", delete_layout()).read(close=True)
                 if e == "Cancel" or e == sg.WIN_CLOSED:
                     continue
                 target = v[0].lower()
-                del v[0]
                 if target in recipes:
-                    continue
-                add_recipe(target, v)
+                    del recipes[v[0]]
+                    save_recipe_file(recipes)
+                    output_message("OUTPUT", f"deleted {v[0]}")
+                else:
+                    output_message("OUTPUT", f"{target} not found in recipes")
+            case "-KEEPTOP-":
+                if keep_output_on_top:
+                    keep_output_on_top = False
+                else:
+                    keep_output_on_top = True
     
     window.close()
 
