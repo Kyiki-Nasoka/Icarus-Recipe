@@ -1,8 +1,21 @@
-#version v0.1.4
-
 import os, sys
 import PySimpleGUI as sg
 import json
+from github import Github
+import config
+
+version = 0.15
+github_link = "https://github.com/Kyiki-Nasoka/Icarus-Recipe"
+
+g = Github(config.GIT_API)
+user = g.get_user()
+repo = user.get_repo("Icarus-Recipe")
+current_version = float(repo.get_contents("Icarus_Recipe/version.txt").decoded_content)
+
+if version < current_version:
+    e, v = sg.Window("Update Available", [[sg.Text(f"current version {version}, available version {current_version}. Please visit the URL below and select {current_version} from tags")],
+        [sg.Input(default_text=github_link)],
+        [sg.Button("OK")]]).read(close=True)
 
 
 if getattr(sys, 'frozen', False):
@@ -126,7 +139,7 @@ def add_recipe(target: str, inc_recipe: dict):
     recipes[target] = {}
     reduced_values = {k:v for k,v in inc_recipe.items() if ("Ingredient" not in v) if ("Count" not in v)} #remove default values
     for x in range(1, int(len(reduced_values)), 2):
-        recipes[target][reduced_values[x].lower()] = int(reduced_values[x+1])
+        recipes[target][reduced_values[x].lower()] = float(reduced_values[x+1])
     save_recipe_file(recipes)
 
 def main() -> None:
