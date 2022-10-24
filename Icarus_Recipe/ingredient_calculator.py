@@ -4,18 +4,18 @@ import json
 from github import Github
 import config
 
-version = 0.15
-github_link = "https://github.com/Kyiki-Nasoka/Icarus-Recipe"
+version = 0.16
+#github_link = "https://github.com/Kyiki-Nasoka/Icarus-Recipe"
 
-g = Github(config.GIT_API)
-user = g.get_user()
-repo = user.get_repo("Icarus-Recipe")
-current_version = float(repo.get_contents("Icarus_Recipe/version.txt").decoded_content)
+#g = Github(config.GIT_API)
+#user = g.get_user()
+#repo = user.get_repo("Icarus-Recipe")
+#current_version = float(repo.get_contents("Icarus_Recipe/version.txt").decoded_content)
 
-if version < current_version:
-    e, v = sg.Window("Update Available", [[sg.Text(f"current version {version}, available version {current_version}. Please visit the URL below and select {current_version} from tags")],
-        [sg.Input(default_text=github_link)],
-        [sg.Button("OK")]]).read(close=True)
+#if version < current_version:
+#    e, v = sg.Window("Update Available", [[sg.Text(f"current version {version}, available version {current_version}. Please visit the URL below and select {current_version} from tags")],
+#        [sg.Input(default_text=github_link)],
+#        [sg.Button("OK")]]).read(close=True)
 
 
 if getattr(sys, 'frozen', False):
